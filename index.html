@@ -46,7 +46,9 @@ function Login(){
 }
    
     
-function connect(){   
+function connect(){
+    var messagebox = document.getElementById("textbox");
+    var message = messagebox.value();
     user = localStorage.user;
     auth = localStorage.auth;
 var options = {
@@ -69,9 +71,22 @@ var options = {
     client.connect();
     
     
+     messagebox.addEventListener("keydown", function (send) {
+        if (send.keyCode === 13) {
+            event.preventDefault();
+                var channel = document.getElementById("channel").value;
+                var messagebox = document.getElementById("textbox");
+                message = " " +messagebox.value;
+                messagebox.value = "";
+                client.say(channel, changecolour());
+                client.say(channel, "/me " + message);
+
+
+        }});
+    
+    
    
-    function validate(send) {
-    }    
+       
     
 
     
@@ -93,18 +108,7 @@ client.join(document.getElementById("channel").value);
 
     
     
- messagebox.addEventListener("keydown", function (send) {
-        if (send.keyCode === 13) {
-            event.preventDefault();
-                var channel = document.getElementById("channel").value;
-                var messagebox = document.getElementById("textbox");
-                message = " " +messagebox.value;
-                messagebox.value = "";
-                client.say(channel, changecolour());
-                client.say(channel, "/me " + message);
 
-
-        }});
 
 channelbox.addEventListener("keydown", function(e) {
     if (!e) { var e = window.event; }
