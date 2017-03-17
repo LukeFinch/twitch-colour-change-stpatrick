@@ -69,18 +69,7 @@ var options = {
     client.connect();
     
     
-    messagebox.addEventListener("keydown", function (send) {
-        if (send.keyCode === 13) {
-            event.preventDefault();
-                var channel = document.getElementById("channel").value;
-                var messagebox = document.getElementById("textbox");
-                message = " " +messagebox.value;
-                messagebox.value = "";
-                client.say(channel, changecolour());
-                client.say(channel, "/me " + message);
-
-
-        }});
+   
     function validate(send) {
     }    
     
@@ -102,11 +91,20 @@ function join() {
 client.join(document.getElementById("channel").value);
 }
 
-//messagebox.addEventListener("keydown", function(e) {
-//    if (!e) { var e = window.event; }
-//    // Enter is pressed
-//    if (e.keyCode == 13) { submitFunction(); }
-//}, false);
+    
+    
+ messagebox.addEventListener("keydown", function (send) {
+        if (send.keyCode === 13) {
+            event.preventDefault();
+                var channel = document.getElementById("channel").value;
+                var messagebox = document.getElementById("textbox");
+                message = " " +messagebox.value;
+                messagebox.value = "";
+                client.say(channel, changecolour());
+                client.say(channel, "/me " + message);
+
+
+        }});
 
 channelbox.addEventListener("keydown", function(e) {
     if (!e) { var e = window.event; }
