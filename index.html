@@ -1,0 +1,254 @@
+<head>
+<title> Happy St Patricks Day </title>
+</head>
+<body style="background:#00dd00;overflow:hidden">
+<h1>LCFinch's Totally Annoying St Patrick's Day Colour Changer</h1>
+<h3>You need Twitch Prime for this to work..</h3>
+USERNAME:<input type=text id="user" placeholder="your name">
+<a href="http://twitchapps.com/tmi/" target="_blank"> AUTH TOKEN ?:</a><input type=password id="auth" placeholder="ouath token"  onchange="join()">
+<button onclick="Login()">Login</button>
+WHO YOU WANNA WATCH:<input type=text id="channel" placeholder="channel" >
+    <button onclick="join()">Go</button>
+
+
+<br>
+<div width=100vw style="background:#222">
+<iframe style="" id="stream" src="https://player.twitch.tv/?volume=0.3&channel=lcfinch" width=80% height=90%></iframe>
+<iframe id="kap" style="position:absolute" src="" Height=80% width="100%"></iframe>
+    <textarea style="position:absolute;top:90%;" cols=50 rows=5 maxlength="500" id="textbox" placeholder="Send a message"></textarea>
+
+    </div>
+      
+</body>
+<script src="http://cdn.tmijs.org/js/latest/1.x/tmi.min.js"></script>
+<script>
+    
+var userbox = document.getElementById("user").value;    
+var authbox = document.getElementById("auth");
+var auth = authbox.value;
+var channelbox = document.getElementById("channel"); 
+var channel = channelbox.value;
+var messagebox = document.getElementById("textbox");
+var message = messagebox.value;
+var i = 83;
+var options;    
+var client;
+
+if (localStorage.user !== null){
+    document.getElementById("user").value = localStorage.user
+}
+if (localStorage.auth !== null){
+    document.getElementById("auth").value = localStorage.auth
+}
+   
+    
+function Login(){
+    localStorage.user = document.getElementById("user").value,
+    localStorage.auth = document.getElementById("auth").value;
+}
+   
+    
+function connect(){   
+    user = localStorage.user;
+    auth = localStorage.auth;
+var options = {
+    options: {
+        debug: true
+    },
+    connection: {
+        reconnect: true
+    },
+    identity: {
+//PUT YOUR USERNAME HERE        
+        username: user,
+//AND YOUR OAUTH HERE: Get it from: http://twitchapps.com/tmi/
+        password: auth,
+    },
+    channels: [channel]
+};
+   var client = new tmi.client(options);
+    sessionStorage.client = client;
+    client.connect();
+    
+    
+    messagebox.addEventListener("keydown", function (send) {
+        if (send.keyCode === 13) {
+            event.preventDefault();
+                var channel = document.getElementById("channel").value;
+                var messagebox = document.getElementById("textbox");
+                message = " " +messagebox.value;
+                messagebox.value = "";
+                client.say(channel, changecolour());
+                client.say(channel, "/me " + message);
+
+
+        }});
+    function validate(send) {
+    }    
+    
+
+    
+    
+    
+};
+
+
+
+    
+
+function join() {
+    document.getElementById("kap").src = "https://www.nightdev.com/hosted/obschat/?channel=" +document.getElementById("channel").value;
+    document.getElementById("stream").src = "https://player.twitch.tv/?volume=0.3&channel=" +document.getElementById("channel").value; 
+
+    connect();
+client.join(document.getElementById("channel").value);
+}
+
+messagebox.addEventListener("keydown", function(e) {
+    if (!e) { var e = window.event; }
+    // Enter is pressed
+    if (e.keyCode == 13) { submitFunction(); }
+}, false);
+
+channelbox.addEventListener("keydown", function(e) {
+    if (!e) { var e = window.event; }
+    // Enter is pressed
+    if (e.keyCode == 13) { join(); }
+}, false);
+    
+    
+  
+
+
+
+    
+    
+//HSL TO RGB
+// expected hue range: [0, 360)
+// expected saturation range: [0, 1]
+// expected lightness range: [0, 1]
+var hslToRgb = function(hue, saturation, lightness){
+  // based on algorithm from http://en.wikipedia.org/wiki/HSL_and_HSV#Converting_to_RGB
+  if( hue == undefined ){
+    return [0, 0, 0];
+  }
+
+  var chroma = (1 - Math.abs((2 * lightness) - 1)) * saturation;
+  var huePrime = hue / 60;
+  var secondComponent = chroma * (1 - Math.abs((huePrime % 2) - 1));
+
+  huePrime = Math.floor(huePrime);
+  var red;
+  var green;
+  var blue;
+
+  if( huePrime === 0 ){
+    red = chroma;
+    green = secondComponent;
+    blue = 0;
+  }else if( huePrime === 1 ){
+    red = secondComponent;
+    green = chroma;
+    blue = 0;
+  }else if( huePrime === 2 ){
+    red = 0;
+    green = chroma;
+    blue = secondComponent;
+  }else if( huePrime === 3 ){
+    red = 0;
+    green = secondComponent;
+    blue = chroma;
+  }else if( huePrime === 4 ){
+    red = secondComponent;
+    green = 0;
+    blue = chroma;
+  }else if( huePrime === 5 ){
+    red = chroma;
+    green = 0;
+    blue = secondComponent;
+  }
+
+  var lightnessAdjustment = lightness - (chroma / 2);
+  red += lightnessAdjustment;
+  green += lightnessAdjustment;
+  blue += lightnessAdjustment;
+
+  return [Math.round(red * 255), Math.round(green * 255), Math.round(blue * 255)];
+
+};
+
+    
+//HSL TO HEX
+
+    
+    
+function max (val, n) {
+  return (val > n) ? n : val
+}
+
+function min (val, n) {
+  return (val < n) ? n : val
+}
+
+function cycle (val) {
+  // for safety:
+  val = max(val, 1e7)
+  val = min(val, -1e7)
+  // cycle value:
+  while (val < 0) { val += 360 }
+  while (val > 359) { val -= 360 }
+  return val
+}
+
+// Now for the main piece, the `hsl` function:
+
+function hsl (hue, saturation, luminosity) {
+  // resolve degrees to 0 - 359 range
+  hue = cycle(hue)
+
+  // enforce constraints
+  saturation = min(max(saturation, 100), 0)
+  luminosity = min(max(luminosity, 100), 0)
+
+  // convert to 0 to 1 range used by hsl-to-rgb-for-reals
+  saturation /= 100
+  luminosity /= 100
+
+  // let hsl-to-rgb-for-reals do the hard work
+  var rgb = hslToRgb(hue, saturation, luminosity)
+
+  // convert each value in the returned RGB array
+  // to a 2 character hex value, join the array into
+  // a string, prefixed with a hash
+  return '#' + rgb
+    .map(function (n) {
+      return (256 + n).toString(16).substr(-2)
+    })
+    .join('')
+}
+
+
+
+    
+ 
+    
+    
+
+var i =137;
+function changecolour() {
+    if (i > 137) {i = 83;
+                  var color = "/color " + hsl((i+= 10),100,50);
+        i++;
+        }
+    else {
+        var color = "/color " + hsl((i+= 10),100,50);
+        i++;
+        }
+    return color;
+    };
+    
+
+
+
+</script>
+
